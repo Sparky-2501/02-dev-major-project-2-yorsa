@@ -1,0 +1,177 @@
+# Yorsa Project Analysis: Flow, Planning, and Code Walkthrough
+
+Yorsa is a premium, modern video conferencing meeting platform. It utilizes **WebRTC** for direct peer-to-peer real-time video/audio streaming and screen sharing, and **Socket.IO** as a signaling server.
+
+---
+
+## 1. Project Planning & Architecture Design
+
+The pre-planning of this application centers on dividing the application into two core components:
+1. **Backend API & Signaling Server**: A Node.js/Express app coupled with Socket.IO that orchestrates user sessions, stores meeting history database logs in MongoDB, and serves as the WebRTC signal broker.
+2. **Frontend React Application**: An interactive SPA (Single Page Application) that manages user state, requests camera/microphone permissions, generates and renders local and remote WebRTC streams, and contains a real-time room chat.
+
+### Technology Stack & Libraries Used
+* **Database**: MongoDB (via `mongoose`) for storing registered users and their meeting history.
+* **Backend**: Express for REST endpoints, `bcrypt` for password hashing, `crypto` for session tokens, and `socket.io` for signaling.
+* **Frontend**: React (Create React App), `react-router-dom` for client-side routing, `@mui/material` & `@mui/icons-material` for glassmorphic elements, `axios` for HTTP requests, and `socket.io-client` for WebRTC signal relay.
+
+---
+
+## 2. WebRTC & Socket.IO Signaling Workflow
+
+Since WebRTC is a serverless, peer-to-peer connection protocol, two browsers cannot communicate directly without knowing each other's IP addresses, port numbers, and media formats. The platform resolves this using a **Signaling Flow**:
+
+```mermaid
+sequenceDiagram
+    participant User A (Client)
+    participant Server (Socket.IO)
+    participant User B (Client)
+
+    User A->>Server: join-call (Room URL)
+    Server-->>User A: User Joined (list of clients)
+    Note over User A, User B: PeerConnection Instantiated on both sides
+    
+    User A->>User A: createOffer() -> local SDP
+    User A->>Server: emit("signal", toId=B, local SDP)
+    Server->>User B: relay("signal", fromId=A, local SDP)
+    User B->>User B: setRemoteDescription(SDP A)
+    User B->>User B: createAnswer() -> local SDP
+    User B->>Server: emit("signal", toId=A, local SDP B)
+    Server->>User A: relay("signal", fromId=B, local SDP B)
+    User A->>User A: setRemoteDescription(SDP B)
+
+    Note over User A, User B: ICE Candidate Exchanges
+    User A->>Server: emit("signal", toId=B, ICE candidate)
+    Server->>User B: relay("signal", fromId=A, ICE candidate)
+    User B->>User B: addIceCandidate()
+    
+    Note over User A, User B: P2P Connection Established (Direct Stream Flow)
+```
+
+---
+
+## 3. Detailed File-by-File Code Walkthrough
+
+### Backend Services
+
+#### 1. [package.json](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/package.json)
+Configures the Node.js application to use ES Modules (`"type": "module"`) so that standard `import`/`export` syntax is supported. Defines scripts:
+* `npm run dev`: Uses `nodemon` to watch and auto-reload `src/app.js`.
+* `npm start`: Runs the server directly using `node`.
+
+#### 2. [app.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/app.js)
+The main entry point of the server:
+* Creates an Express app and attaches a standard HTTP server using `node:http`.
+* Initializes Socket.IO by passing the server to the `connectToSocket` manager.
+* Configures middleware: CORS (`cors`), body parsers (`express.json` and `urlencoded` with a `40kb` payload limit).
+* Mounts user auth routes at `/api/v1/users`.
+* Connects to a MongoDB Atlas cluster and starts listening on port `8000`.
+
+#### 3. [user.model.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/models/user.model.js)
+Defines the Mongoose database schema for users:
+* `name` (String, required)
+* `username` (String, unique, required)
+* `password` (String, hashed, required)
+* `token` (String, holds the user's active session/auth token)
+
+#### 4. [meeting.model.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/models/meeting.model.js)
+Defines the Mongoose schema for the meeting history logs:
+* `user_id` (String: holds the user's username)
+* `meetingCode` (String, required)
+* `date` (Date, defaults to current timestamp)
+
+#### 5. [users.routes.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/routes/users.routes.js)
+Maps REST API paths to controller functions:
+* `POST /login`: Logs in a user.
+* `POST /register`: Registers a new user.
+* `POST /add_to_activity`: Adds a meeting code to a user's history log.
+* `GET /get_all_activity`: Retrieves the entire meeting history for a authenticated user session.
+
+#### 6. [user.controller.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/controllers/user.controller.js)
+Implements endpoint handlers:
+* `register`: Checks if username exists, hashes password using `bcrypt` (10 rounds), saves user.
+* `login`: Checks credentials, compares password using `bcrypt.compare`, generates a secure random 20-byte token via standard NodeJS `crypto.randomBytes(20).toString("hex")`, updates user document, and returns it.
+* `getUserHistory`: Resolves a token to a user profile and queries the database for all `Meeting` logs matching `user_id`.
+* `addToHistory`: Saves a meeting log to MongoDB referencing the user and the meeting code.
+
+#### 7. [socketManager.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/backend/src/controllers/socketManager.js)
+The core WebRTC signaling hub. Manages `connections`, `messages`, and `timeOnline` states:
+* `join-call`: Links the socket to a room identifier (its browser URL path). If a room doesn't exist, initializes it. Broadcasts a `user-joined` event containing the joining socket ID and lists all other sockets in the room, so the clients can establish peer connections. Then replays all previous chat messages of that session to the newcomer.
+* `signal`: Direct relay system. Receives a message payload (SDP offer/answer or ICE candidate) containing a target `toId` and sends it to the recipient via `io.to(toId).emit('signal', socket.id, message)`.
+* `chat-message`: Emits messages to all socket connections in the sender's active room.
+* `disconnect`: Triggers when a user closes their tab. Loops through rooms to identify the disconnected socket, notifies remaining peers via `user-left`, cleans up the socket from lists, and clears cached messages if the room becomes empty.
+
+---
+
+### Frontend Services
+
+#### 1. [package.json](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/package.json)
+Manages frontend library dependencies (`react`, `react-router-dom`, `@mui/material`, `socket.io-client`, `axios`) and scripts.
+
+#### 2. [environment.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/environment.js)
+Exports the server's backend URL. Configures `IS_PROD = true` (targets Render hosting) or `false` (targets local environment `http://localhost:8000`).
+
+#### 3. [index.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/index.js)
+Entry point of the React runtime. Renders the `<App />` inside React's Virtual DOM wrapper.
+
+#### 4. [App.js](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/App.js)
+Sets up global animations (glassmorphic ambient background blobs), client-side routes, and contexts:
+* `/`: `LandingPage`
+* `/auth`: `Authentication`
+* `/home`: `HomeComponent` (Lobby)
+* `/history`: `History`
+* `/:url`: `VideoMeetComponent` (Video conference room)
+
+#### 5. [AuthContext.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/contexts/AuthContext.jsx)
+React Context containing axios endpoints:
+* Creates an instance of Axios pointing to the user route path.
+* `handleRegister` & `handleLogin`: Executes calls, sets `token` to local storage, and handles redirects.
+* `getHistoryOfUser` & `addToUserHistory`: Authenticates requests by supplying the local storage token.
+
+#### 6. [withAuth.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/utils/withAuth.jsx)
+A Higher-Order Component (HOC) that secures routes. If a token is not present in local storage, it blocks access and redirects to `/auth`.
+
+#### 7. [landing.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/pages/landing.jsx)
+Displays the welcome landing page. Features options to join directly as a guest or access authentication options.
+
+#### 8. [authentication.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/pages/authentication.jsx)
+A premium login and registration form card:
+* Features fluid css height and slide transitions when toggling between "Sign In" and "Sign Up".
+* Calls `AuthContext` routines and displays validation message snackbars.
+
+#### 9. [home.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/pages/home.jsx)
+The user's home dashboard/lobby. Wrapped with `withAuth`. Provides functionality to:
+* Generate a random room code (e.g. `yorsa-xxxx-xxxx`), store it in history, and navigate there.
+* Join an existing meeting via code.
+* Route to past meeting history logs, or sign out.
+
+#### 10. [history.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/pages/history.jsx)
+Retrieves and lists all user's meetings in a grid of glass-container cards. Formats ISO dates into readable `DD/MM/YYYY` format.
+
+#### 11. [VideoMeet.jsx](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/pages/VideoMeet.jsx)
+The most complex file in the codebase. Handles local media permissions and WebRTC peer connection setup:
+* **Lobby Stage**: Asks for a username and uses `navigator.mediaDevices.getUserMedia` to preview local camera video.
+* **Connection Stage**: Connects to the Socket.IO server.
+  * Listens for `signal`: routes signaling messages (offers, answers, ICE) to respective RTCPeerConnection instances in `connections`.
+  * Listens for `user-joined`: for each socket user in the room, sets up a new `RTCPeerConnection` instance using a STUN server (`stun:stun.l.google.com:19302`) to find public NAT IP endpoints.
+  * Adds local media streams (`window.localStream`) to the connection.
+  * Handles `onicecandidate` callback to send local network routing details.
+  * Handles `onaddstream` callback to add the remote participant's feed to the `videos` array.
+* **Control Actions**:
+  * Toggles video (`handleVideo`) and audio (`handleAudio`) by enabling or disabling tracks on the stream.
+  * Toggles screen sharing (`handleScreen`) by replacing stream tracks using `navigator.mediaDevices.getDisplayMedia`.
+  * Renders a real-time room chat component beside the video conference grid.
+  * Exits meeting (`handleEndCall`) by releasing all active tracks and redirecting.
+
+---
+
+### Styling Architecture
+
+#### 1. [index.css](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/index.css)
+Declares the dark-themed variables (CSS custom properties) including colors, fonts, border properties, and gradients. Includes floating backdrop animations (`.bg-animations`) using rotating CSS keyframes and glassmorphic designs (`.glass-container`).
+
+#### 2. [App.css](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/App.css)
+Handles responsive layouts and layout styles for the landing page, authentications, lobby panels, and history grid. Overwrites Material UI rules to match the theme.
+
+#### 3. [videoComponent.module.css](file:///c:/Users/prathamesh%20shelke/Desktop/OneDrive/coding/DEVLOPEMENT/DEVHUB/major%20project%202%20-Yorsa/frontend/src/styles/videoComponent.module.css)
+Provides CSS module scope for the meeting page. Stylizes control buttons, participant grids (with dynamic viewport resizing depending on chat-visibility state), active bubble messages, and side panel animations.

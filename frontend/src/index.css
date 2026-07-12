@@ -1,0 +1,193 @@
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --accent-purple: #aa53f1;
+  --accent-purple-light: #d093ff;
+  --accent-purple-dark: #813ebb;
+  --text-primary: #ffffff;
+  --text-secondary: #a493b5;
+  --glass-bg: rgba(8, 4, 15, 0.75);
+  --glass-border: rgba(157, 78, 221, 0.2);
+  --glass-border-hover: rgba(199, 125, 255, 0.45);
+  --glass-glow: 0 8px 32px 0 rgba(157, 78, 221, 0.15);
+  --font-family: 'Outfit', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-purple);
+}
+
+/* Animated BG Blobs */
+.bg-animations {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #0d0414 0%, #030107 100%);
+}
+
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.45;
+  mix-blend-mode: screen;
+  animation: float 25s infinite alternate ease-in-out;
+}
+
+.bg-blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, var(--accent-purple-dark) 0%, rgba(0,0,0,0) 70%);
+  animation-duration: 20s;
+}
+
+.bg-blob-2 {
+  bottom: -15%;
+  right: -10%;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, #5a189a 0%, rgba(0,0,0,0) 70%);
+  animation-duration: 30s;
+  animation-delay: -5s;
+}
+
+.bg-blob-3 {
+  top: 40%;
+  left: 30%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, #3c096c 0%, rgba(0,0,0,0) 70%);
+  animation-duration: 25s;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(10vw, 5vh) scale(1.15) rotate(120deg);
+  }
+  66% {
+    transform: translate(-5vw, 15vh) scale(0.9) rotate(240deg);
+  }
+  100% {
+    transform: translate(5vw, -10vh) scale(1.05) rotate(360deg);
+  }
+}
+
+/* Glassmorphism Styles */
+.glass-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-glow);
+  border-radius: 24px;
+}
+
+/* Modern Button Animations */
+.btn-yorsa {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-yorsa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(157, 78, 221, 0.5), 0 0 0 1px rgba(199, 125, 255, 0.4);
+  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
+}
+
+.btn-yorsa:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(157, 78, 221, 0.2);
+}
+
+.btn-yorsa::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-speed);
+  pointer-events: none;
+}
+
+.btn-yorsa:hover::after {
+  opacity: 1;
+}
+
+.btn-yorsa-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  backdrop-filter: blur(10px);
+}
+
+.btn-yorsa-secondary:hover {
+  background: rgba(157, 78, 221, 0.15);
+  border-color: var(--accent-purple);
+  transform: translateY(-2px);
+}
+
+.btn-yorsa-secondary:active {
+  transform: translateY(1px);
+}

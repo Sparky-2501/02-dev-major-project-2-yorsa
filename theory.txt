@@ -1,0 +1,267 @@
+sockets:
+    -one ned of the connection
+        endpoint between server and client (ip+port no.)
+
+protocols:
+    -communication rules
+      |----------------------------------------|
+    TCP(transmission control protocol)      UDP(user datagram protocol)
+        |                                           |
+    browser,google drive                    reliablity,fast {video call}
+    (reliable,data integrity,slow)
+
+WEBRTC for video communication:
+    -web realtime communication
+    -UDP based
+    -bi directional
+    -serverless communication
+
+    how it work?
+        -signalling (uses signal description protocol(SDP) -> works like a class representative)   server
+        -connecting (interactive connectivity establishment protocol(ICE) ->make direct connection bet 2 system)     serverless
+        -securing (DLTS & SRTP -> encryption) 
+        -communicating (RTP & SCTP)
+
+WEBRTC APIS:
+    -Mediastream
+    -RTCPeerConnection
+    -RTCDataChannel
+
+WEBRTC ARCHITECTURE:
+    -P2P ✓
+    -SFU (selective forwarding unit) 1 server
+    -MCU (multi point control unit)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+CORS:
+    -Cross-Origin Resource Sharing, is a security feature implemented by web browsers to control how web applications can request resources from different origins
+    -prevent malicious websites from making unauthorized requests to another site on behalf of the user.
+
+    how it works?
+        -web appllication make a request to the Resource.
+        -browser check if the target server allow the request.
+        -this is done by server sending specific HTTP headers in response.
+        -headers dictate what types of requests are allowed from different origins.
+    
+    imp headers:
+        -Access-Control-Allow-Origin -specifies the Origin
+        -Access-Control-Allow-Methods -list HTTP methods
+        -Access-Control-Allow-Headers -specifies HTTP Headers
+        -Access-Control-Allow-Credentials -indicate whether the request can include the user credentials
+        -Access-Control-Expose-Headers -indicate which headers can be exposed to the browser
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+backend packages:
+
+npm i mongoose express nodemon bcrypt http-status socket.io
+
+frontend:
+
+npm i react-router-dom @mui/material @emtion/styled @emtion/react axios http-status socket.io-client
+
+stun server:
+    lightweight servers running on public internet which returns ip address of requesters device 
+
+Navigator:
+    represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.
+
+
+                 YORSA
+
+      ┌─────────────────────┐
+      │ Authentication       │  (Login/Register)
+      └──────────┬──────────┘
+                 │
+      ┌──────────▼──────────┐
+      │ Meeting Room Logic   │
+      │ Room IDs, Users      │
+      └──────────┬──────────┘
+                 │
+      ┌──────────▼──────────┐
+      │ Socket.IO Signaling │
+      │ Exchange SDP & ICE  │
+      └──────────┬──────────┘
+                 │
+      ┌──────────▼──────────┐
+      │ WebRTC              │
+      │ Video Audio Stream  │
+      └──────────┬──────────┘
+                 │
+      ┌──────────▼──────────┐
+      │ UI Controls         │
+      │ Mic Camera Screen   │
+      │ Chat                │
+      └─────────────────────┘
+
+basic flowchart:
+    Step 1
+    Access camera and microphone
+
+    ↓
+
+    Step 2
+    Create room
+
+    ↓
+
+    Step 3
+    Connect users through socket
+
+    ↓
+
+    Step 4
+    Exchange WebRTC information
+
+    ↓
+
+    Step 5
+    Start video stream
+
+    ↓
+    Step 6
+    Add controls
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------
+first thing Browser asks for camera and mic:
+   
+   [    navigator.mediaDevices.getUserMedia()   ] 
+
+   1.navigator=> 
+   
+     window - navigator - mediaDevices
+
+    window
+    ├── document
+    ├── location
+    ├── navigator ✓  navigator.mediaDevices->Browser's media API.
+    ├── localStorage
+
+
+    2.mediaDevices=>
+
+    functions
+    |--getUserMedia() ✓
+    |--getDisplayMedia()
+    |--enumerateDevices()
+
+    getUserMedia()=>
+
+    [
+        const stream =
+        await navigator.mediaDevices.getUserMedia({
+            video:true,
+            audio:true
+        });
+    ]
+
+    **OUTPUT RECEIVED AS A MEDIASTREAM {a container of camera video and microphoneaudio}**
+
+---------------------------------------------------------------------------------------------------------------------
+Camera OFF:
+    Stop stream 
+    Disable track✓
+
+    [
+        const track =
+        stream.getVideoTracks()[0];
+        track.enabled = false;
+    ]
+
+------------------------------------------------------------------------------------------------------------------------
+How 2 rooms remain separate?
+
+Server stores
+        rooms = {
+            ABC:[
+            socket1,
+            socket2,
+            socket3
+            ],
+
+            XYZ:[
+            socket4,
+            socket5
+            ]
+        }
+
+When someone joins
+    [
+        socket.emit(
+        "join-room",
+        roomId
+    )
+    ]
+---------------------------------------------------------------------------------------------------------------------
+Socket.IO:
+
+Video goes directly
+
+Peer A
+↓
+Peer B
+
+using WebRTC
+
+      Socket Server
+
+      /         \
+
+   You        Rahul
+
+Socket server only introduces people. It does NOT carry video.
+
+[const socket = io(serverURL);]
+
+means:
+Browser->WebSocket Connection->Node Server
+-------------------------------------------------------------------------------------------------------------------
+WebRTC:
+
+    we have our camera our stream on my own browser now how does person x sees this stream on his browser ?
+    MediaStream exists only inside your browser memory.person x's browser has absolutely no access to it
+    So we need something that says "Take my MediaStream and send it to Rahul." That is WebRTC.
+
+So WebRTC's job is :Transport MediaStreams between browsers.
+
+setup structure-
+[
+    connectionsRef.current[id] = new RTCPeerConnection(...)
+]
+---------------------------------------------------------------------------------------------------------------------
+SDP and ICE:
+
+SDP:(Session Description Protocol)
+    My Camera - 1920x1080 - Codec - VP8 - Audio - OPUS - Video Yes - Audio Yes
+    All this becomes one long text
+
+    [   peer.createOffer() ]
+
+    Browser creates SDP.-> send SDP through Socket.
+
+    Other browser receives SDP.
+
+    [   peer.setRemoteDescription(...)  ]
+
+    Now it knows What kind of connection you want. Then it replies
+
+   [ createAnswer() ]
+
+    Another SDP.    
+
+ICE:
+    Every computer has WiFi IP, Mobile IP, LAN IP, VPN, etc.
+    Browser searches Which network path works?
+-----------------------------------------------------------------------------
+srcObject:
+
+image ->.img 
+video -> .mp4
+stream->srcObject
+-----------------------------------------------------------------------------------------------------------  
+getUserMedia() captures your camera and microphone.
+<video> + srcObject displays any MediaStream (local or remote).
+Socket.IO introduces participants and relays signaling messages (room joins, SDP, ICE).
+WebRTC (RTCPeerConnection) sends the actual audio and video directly between browsers.
+SDP describes what each browser wants and supports.
+ICE discovers a network path that allows the direct peer-to-peer connection
