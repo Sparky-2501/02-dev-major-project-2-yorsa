@@ -60,8 +60,9 @@ Instead of routing video through the server, YORSA leverages **WebRTC** for dire
 ## 🔄 Application Workflow
 
 <div align="center">
-  <img src="./Venn Diagram.jpg" alt="YORSA Application Workflow" width="900" height="350">
+  <img src="./Venn Diagram.jpg" alt="YORSA Application Workflow" width="800" height="250">
 </div>
+
 ---
 
 # 🎯 Future Improvements
