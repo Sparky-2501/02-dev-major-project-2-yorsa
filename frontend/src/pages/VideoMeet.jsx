@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import io from "socket.io-client";
-import { Badge, IconButton, TextField } from '@mui/material';
+import { Badge, IconButton, TextField, Snackbar } from '@mui/material';
 import { Button } from '@mui/material';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff'
@@ -11,6 +11,7 @@ import MicOffIcon from '@mui/icons-material/MicOff'
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare'
 import ChatIcon from '@mui/icons-material/Chat'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import server from '../environment';
 import { useParams } from 'react-router-dom';
 
@@ -58,6 +59,8 @@ export default function VideoMeetComponent() {
     const videoRef = useRef([])
 
     let [videos, setVideos] = useState([])
+
+    let [copyToastOpen, setCopyToastOpen] = useState(false);
 
     // TODO
     // if(isChrome() === false) {
@@ -429,6 +432,11 @@ export default function VideoMeetComponent() {
         setScreen(!screen);
     }
 
+    let handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopyToastOpen(true);
+    }
+
     let handleEndCall = () => {
         try {
             let tracks = localVideoref.current.srcObject.getTracks()
@@ -588,6 +596,14 @@ export default function VideoMeetComponent() {
                             </IconButton> : <></>}
 
                         <IconButton 
+                            onClick={handleCopyLink} 
+                            className={styles.controlButton}
+                            title="Copy Meeting Link"
+                        >
+                            <ContentCopyIcon />
+                        </IconButton>
+
+                        <IconButton 
                             onClick={() => setModal(!showModal)} 
                             className={`${styles.controlButton} ${showModal ? styles.active : ''}`}
                         >
@@ -624,6 +640,13 @@ export default function VideoMeetComponent() {
                             </div>
                         ))}
                     </div>
+
+                    <Snackbar
+                        open={copyToastOpen}
+                        autoHideDuration={3000}
+                        onClose={() => setCopyToastOpen(false)}
+                        message="Meeting link copied to clipboard!"
+                    />
 
                 </div>
 

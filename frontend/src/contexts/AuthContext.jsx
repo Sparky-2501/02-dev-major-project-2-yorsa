@@ -51,7 +51,13 @@ export const AuthProvider = ({ children }) => {
 
             if (request.status === httpStatus.OK) {
                 localStorage.setItem("token", request.data.token);
-                router("/home")
+                const redirectPath = sessionStorage.getItem("redirectAfterLogin");
+                if (redirectPath) {
+                    sessionStorage.removeItem("redirectAfterLogin");
+                    router(redirectPath);
+                } else {
+                    router("/home");
+                }
             }
         } catch (err) {
             throw err;

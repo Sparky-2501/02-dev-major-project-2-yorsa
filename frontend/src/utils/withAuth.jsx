@@ -14,6 +14,7 @@ const withAuth = (WrappedComponent ) => {
 
         useEffect(() => {
             if(!isAuthenticated()) {
+                sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
                 router("/auth")
             }
         }, [])
