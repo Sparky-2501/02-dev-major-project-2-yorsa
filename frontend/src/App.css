@@ -1,377 +1,87 @@
-/* App.css */
-.landingPageContainer {
+/* =========================================================================
+   YORSA — GOOGLE MEET ADVANCED UI SYSTEM
+   ========================================================================= */
+
+.App {
+  min-height: 100vh;
   width: 100vw;
-  height: 100vh;
-  background: transparent;
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+  background-color: var(--bg-primary, #131314);
+  color: var(--text-primary, #e8eaed);
+  font-family: var(--font-family);
 }
 
-.landingNavbar {
-  margin: 1.5rem 2rem;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /* border-radius: 1px !important; */
-}
-
-.logoText {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #fff 30%, var(--accent-purple-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.logoSubtext {
-  font-size: 0.8rem;
-  font-weight: 400;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  display: inline-block;
-  margin-left: 8px;
-  -webkit-text-fill-color: var(--text-secondary);
-}
-
-.landingNavbar .navlist {
-  display: flex;
-  gap: 1.2rem;
-  align-items: center;
-}
-
-.landingMainContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding-inline: 4rem;
-  flex-grow: 1;
-  gap: 2rem;
-}
-
-.landingHeroText {
-  flex: 1;
-  max-width: 600px;
-}
-
-.landingHeroText h1 {
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-}
-
-.gradientText {
-  background: linear-gradient(135deg, var(--accent-purple-light) 0%, var(--accent-purple) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.heroSubtitle {
-  font-size: 1.25rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-}
-
-.landingHeroImage {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.landingHeroImage img {
-  max-height: 65vh;
-  width: auto;
-  filter: drop-shadow(0 20px 50px rgba(157, 78, 221, 0.2));
-  animation: floatImage 6s infinite ease-in-out;
-}
-
-@keyframes floatImage {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-/* Home / Lobby Styling */
-.navBar {
-  margin: 1.5rem 2rem;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-glow);
-  border-radius: 16px;
-}
-
-.meetContainer {
-  display: flex;
-  padding-inline: 4rem;
-  height: 70vh;
-  gap: 5vw;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.leftPanel {
-  flex: 1.2;
-  max-width: 600px;
-}
-
-.leftPanel h2 {
-  font-size: 2.8rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, #ffffff 40%, var(--accent-purple-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.rightPanel {
-  flex: 0.8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.rightPanel img {
-  width: 100%;
-  max-width: 400px;
-  height: auto;
-  border-radius: 24px;
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-glow), 0 20px 40px rgba(0,0,0,0.5);
-}
-
-/* MUI Customizations to integrate with Purple & Glass Theme */
+/* Material UI Overrides for Google Meet Aesthetic */
 .MuiPaper-root {
-  background-color: var(--glass-bg) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--glass-border) !important;
-  backdrop-filter: blur(16px) !important;
+  background-color: var(--bg-secondary, #202124) !important;
+  color: var(--text-primary, #e8eaed) !important;
+  border: 1px solid var(--border-subtle, #3c4043) !important;
+  border-radius: 12px !important;
 }
 
-.MuiInputBase-root {
-  color: var(--text-primary) !important;
+.MuiDialog-paper {
+  border-radius: 16px !important;
+  background-color: var(--bg-secondary, #202124) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
 }
 
-.MuiOutlinedInput-notchedOutline {
-  border-color: var(--glass-border) !important;
+.MuiMenu-paper {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
-.MuiFormLabel-root {
-  color: var(--text-secondary) !important;
+.MuiMenuItem-root {
+  font-family: var(--font-family) !important;
+  font-size: 0.9rem !important;
+  padding: 10px 16px !important;
+  transition: background 0.15s ease !important;
 }
 
-.MuiFormLabel-root.Mui-focused {
-  color: var(--accent-purple-light) !important;
+.MuiMenuItem-root:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #8ab4f8 !important;
 }
 
-.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--accent-purple) !important;
-  box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
+.MuiTab-root {
+  font-family: var(--font-family) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
 }
 
-/* History Page styling wrapper */
-.historyContainer {
-  padding: 3rem 4rem;
-}
-
-.historyHeader {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.historyTitle {
-  font-size: 2.2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #fff 50%, var(--accent-purple-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.historyGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-.historyCard {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all var(--transition-speed) ease;
-  box-shadow: var(--glass-glow);
-}
-
-.historyCard:hover {
-  transform: translateY(-5px);
-  border-color: var(--accent-purple-light);
-  box-shadow: 0 12px 30px rgba(157, 78, 221, 0.25);
-}
-
-/* Auth Screen Styling */
-.authContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  padding: 1.5rem;
-}
-
-.authCard {
+/* Google Meet Input Styles */
+.meet-input {
   width: 100%;
-  max-width: 480px;
-  padding: 3rem 2.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.authLogo {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, #fff 40%, var(--accent-purple-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.authTabs {
-  display: flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  padding: 4px;
-  border-radius: 12px;
-  width: 100%;
-  margin-bottom: 2rem;
-  position: relative;
-}
-
-.authTabButton {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  padding: 10px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  z-index: 1;
+  background: var(--bg-elevated, #28292a);
+  border: 1px solid var(--border-subtle, #3c4043);
   border-radius: 8px;
-  transition: color 0.3s ease;
-}
-
-.authTabButton.active {
-  color: #fff;
-}
-
-.authTabIndicator {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
-  border-radius: 8px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
-}
-
-.authTabIndicator.registerActive {
-  transform: translateX(100%);
-}
-
-.authForm {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.authInputGroup {
-  position: relative;
-  width: 100%;
-}
-
-.authInputField {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  color: var(--text-primary);
-  font-size: 1rem;
+  padding: 12px 16px;
+  color: var(--text-primary, #e8eaed);
+  font-size: 0.95rem;
+  font-family: var(--font-family);
   outline: none;
-  transition: all 0.3s ease;
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
-.authInputField:focus {
-  border-color: var(--accent-purple-light);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 15px rgba(199, 125, 255, 0.2);
+.meet-input:focus {
+  border-color: #8ab4f8;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.25);
 }
 
-.authInputLabel {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-secondary);
-  pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
+/* Pulse keyframes for active AI listening & recording */
+@keyframes pulseRec {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-.authInputField:focus + .authInputLabel,
-.authInputField:not(:placeholder-shown) + .authInputLabel {
-  top: 0;
-  font-size: 0.8rem;
-  left: 12px;
-  background: #08040f;
-  padding: 2px 6px;
-  color: var(--accent-purple-light);
-  border-radius: 4px;
-}
-
-/* Height and Fade transitions for registration Name field */
-.animateHeightContainer {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-}
-
-.animateHeightContainer.show {
-  max-height: 80px;
-  opacity: 1;
-}
-
-.authErrorMessage {
-  color: #ff5252;
-  font-size: 0.875rem;
-  text-align: center;
-  min-height: 20px;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meet-controls-bar {
+    bottom: 8px !important;
+    padding: 8px 12px !important;
+    gap: 8px !important;
+    width: 96% !important;
+    justify-content: space-around !important;
+  }
 }

@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "prod": "pm2 start src/app.js"
+    "prod": "pm2 start src/app.js",
+    "test": "node tests/meetingFlow.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -17,9 +18,14 @@
     "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
     "http-status": "^2.1.0",
     "mongoose": "^9.7.4",
     "nodemon": "^3.1.14",
     "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
   }
 }

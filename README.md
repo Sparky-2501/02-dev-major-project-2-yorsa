@@ -1,96 +1,96 @@
-<div align="center">
+# 🎥 YORSA — Executive Video Conferencing & AI Intelligence
 
-# 🎥 YORSA 
-### A Modern Full-Stack Video Conferencing Platform
-
-Built with **React**, **Node.js**, **Express**, **MongoDB**, **WebRTC**, and **Socket.IO**
-
-</div>
+> **A modern full-stack video meeting platform built with React, Node.js, Express, MongoDB, WebRTC, Socket.IO, and Hugging Face Serverless Inference.**
 
 ---
 
 ## 📖 Overview
 
-**YORSA** is a full-stack real-time video conferencing platform inspired by applications like Zoom and Google Meet.
+**YORSA** is an executive-grade, real-time video conferencing application designed for high-clarity collaboration. It combines direct peer-to-peer **WebRTC** media streaming with real-time **Socket.IO** signaling and a serverless **Hugging Face AI** layer for speech transcription, executive summaries, interactive mind maps, and collaborative notes.
 
-The application enables users to securely create and join meetings, communicate through peer-to-peer video calls, exchange real-time chat messages, and maintain a personal meeting history.
-
-Instead of routing video through the server, YORSA leverages **WebRTC** for direct browser-to-browser communication, while **Socket.IO** is used for signaling and room management.
-
----
-
-## ✨ Features
-
-| 👤 User Management | 📹 Video Meetings |💬 Real-Time Communication | 📊 Additional Features |
-|-------------------|-------------------|---------------------------|-----------------------|
-| Secure User Registration | Create & Join Meeting Rooms |WebRTC Signaling | Meeting History |
-| User Login Authentication | Peer-to-Peer Video Calling |Real-Time Chat | MongoDB Data Storage |
-| Password Encryption (bcrypt) | Camera & Microphone Access |Socket.IO Events | RESTful APIs |
-| Session Token Management | Multi-Participant Meetings |Instant User Notifications | MVC Backend Architecture |
+### Core Architecture Highlights
+- **Direct WebRTC Mesh**: Zero-latency peer-to-peer media paths eliminating central media server bottlenecks.
+- **AI Meeting Synthesis**: Hugging Face LLM pipeline (`Qwen2.5-7B-Instruct` / `Meta-Llama-3.1-8B-Instruct`) and Whisper STT generating executive briefs, action items, and mind maps.
+- **Enterprise Host Governance**: Server-authoritative Mute-All and selective Mic Locking with reconnect state synchronization.
+- **Autonomous Network Adaptation**: Autonomous `getStats()` latency and packet-loss monitoring with video auto-pause and hysteresis recovery.
+- **Luxury/Editorial Visual System**: Warm alabaster/charcoal/gold styling with Playfair Display and Inter typography.
 
 ---
 
-## 🛠 Tech Stack
+## 📚 Complete Company-Grade Documentation (`/docs`)
 
-### Frontend
+Explore our comprehensive engineering documentation structured for production scale:
 
-- React
-- CSS
-
-### Backend
-
-- Node.js
-- Express.js
-- Socket.IO
-- bcrypt
-- HTTP Status
-- Crypto
-
-### Database
-
-- MongoDB Atlas
-
-### Real-Time Technologies
-
-- WebRTC
-- Socket.IO
-
----
-
-## 🔄 Application Workflow
-
-<div align="center">
-  <img src="./Venn Diagram.jpg" alt="YORSA Application Workflow" width="800" height="350">
-</div>
+```
+/docs
+  ├── architecture/
+  │    ├── HLD.md                   # High-Level Design & System Topology
+  │    ├── LLD.md                   # Low-Level Design, Schemas & Sequence Diagrams
+  │    └── tech-stack.md            # In-Depth Stack Rationale
+  ├── api/
+  │    ├── api-reference.md         # Complete REST API Specifications
+  │    └── socket-events.md         # Socket.IO Real-Time Protocol Contracts
+  ├── features/
+  │    ├── host-controls.md         # Host Mute-All & Mic Governance Spec
+  │    ├── ai-summary-pipeline.md   # Speech-to-Text & AI Synthesis Spec
+  │    └── network-adaptation.md    # WebRTC Latency Detection & Auto-Pause Spec
+  ├── decisions/
+  │    ├── ADR-001-ai-provider.md   # Architecture Decision: Hugging Face API Choice
+  │    ├── ADR-002-realtime-signaling.md # Architecture Decision: WebRTC Mesh vs SFU
+  │    └── ADR-003-editorial-design-system.md # Architecture Decision: Editorial vs Utility
+  └── runbook/
+       ├── setup.md                 # Local Dev Setup & Env Configuration
+       └── deployment.md            # Production Deployment Checklist
+```
 
 ---
 
-# 🎯 Future Improvements
+## ✨ Features Breakdown
 
-- Screen Sharing
-- Recording Meetings
-- Raise Hand Feature
-- Meeting Scheduling
-- Waiting Room
-- Email Invitations
-- Emoji Reactions
-- Dark Mode
-- Virtual Background
-- AI Meeting Summary
-- Live Captions
-- File Sharing
+| Feature Domain | Capabilities |
+| :--- | :--- |
+| 📹 **Video Conferencing** | Multi-peer WebRTC mesh, dynamic reflowing grid, spotlight pinning, screen presentation |
+| 🛡️ **Host Governance** | Server-verified Mute All, participant mic locking, waiting room gatekeeping, remove attendee |
+| 🤖 **AI Synthesis** | Speech-to-text chunk buffering, executive meeting summary, prioritized action items |
+| 🗺️ **Visual Mind Maps** | Hierarchical SVG graph tree with pan/zoom, bezier curves, and thematic color coding |
+| 📶 **Network Self-Healing** | `getStats()` polling, packet-loss thresholds, auto video pause, 3-point hysteresis recovery |
+| 🔗 **Frictionless Invites** | Cryptographic slugs (`/meeting/yorsa-xxxx-xxxx`), Clipboard API toast, WhatsApp & Email share |
+| 🎨 **Editorial Design** | Dual-mode aesthetics: Luxury Editorial for workspaces + Google Meet utility for calls |
 
 ---
 
-# 📚 Key Learnings
+## ⚡ Quick Start
 
-- Full-Stack MERN Development
-- MVC Architecture
-- REST API Design
-- MongoDB Schema Design
-- Authentication & Security
-- WebRTC Fundamentals
-- Socket.IO Real-Time Communication
-- Peer-to-Peer Networking
-- React Context API
-- State Management
+### 1. Configure Backend Environment
+Create `backend/.env`:
+```env
+PORT=8000
+MONGO_URI=mongodb://localhost:27017/yorsa
+HF_API_TOKEN=hf_your_token_here
+```
+
+### 2. Run Locally
+```bash
+# Terminal 1: Launch Backend API & Signaling Hub
+cd backend
+npm install
+npm run dev
+
+# Terminal 2: Launch React Frontend Application
+cd frontend
+npm install
+npm start
+```
+*Access the platform at `http://localhost:3000`.*
+
+### 3. Run Integration Test Suite
+```bash
+cd backend
+npm test
+```
+*Verifies all functional flows: room auto-approval, waiting queue gatekeeper, chat broadcasting, Host Mute-All and Mic Lockdown, WebRTC SDP signal relays, REST link validation, and AI summarization / mind map generation.*
+
+---
+
+## 🛡️ License
+Distributed under the ISC License. Built with ❤️ for executive dialogue.

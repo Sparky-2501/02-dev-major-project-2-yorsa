@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Snackbar } from '@mui/material';
-import "../App.css";
+import { useNavigate } from 'react-router-dom';
+import VideocamIcon from '@mui/icons-material/Videocam';
 
 export default function Authentication() {
     const [username, setUsername] = React.useState("");
@@ -13,8 +14,9 @@ export default function Authentication() {
     const [open, setOpen] = React.useState(false);
 
     const { handleRegister, handleLogin } = React.useContext(AuthContext);
+    const navigate = useNavigate();
 
-    let handleAuth = async (e) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
         setError("");
         try {
@@ -23,7 +25,6 @@ export default function Authentication() {
             }
             if (formState === 1) {
                 let result = await handleRegister(name, username, password);
-                console.log(result);
                 setUsername("");
                 setMessage(result);
                 setOpen(true);
@@ -33,85 +34,189 @@ export default function Authentication() {
                 setName("");
             }
         } catch (err) {
-            console.log(err);
-            let errMsg = err.response?.data?.message || "An error occurred";
+            console.error(err);
+            let errMsg = err.response?.data?.message || "An authentication error occurred.";
             setError(errMsg);
         }
     };
 
     return (
-        <div className="authContainer">
-            <div className="authCard glass-container">
-                <div className="authLogo">
-                    Yorsa
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem 1.5rem',
+            background: 'var(--bg-primary, #131314)'
+        }}>
+            <div style={{
+                maxWidth: '440px',
+                width: '100%',
+                background: 'var(--bg-secondary, #202124)',
+                border: '1px solid var(--border-subtle, #3c4043)',
+                borderRadius: '24px',
+                padding: '3rem 2.5rem',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                {/* Google Meet Logo & Header */}
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #1a73e8 0%, #34a853 50%, #fbbc04 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 16px auto',
+                        boxShadow: '0 4px 14px rgba(26, 115, 232, 0.4)'
+                    }}>
+                        <VideocamIcon style={{ color: '#ffffff', fontSize: '1.8rem' }} />
+                    </div>
+
+                    <h1 style={{
+                        fontSize: '1.6rem',
+                        fontWeight: 500,
+                        color: 'var(--text-primary, #e8eaed)',
+                        margin: '0 0 6px 0'
+                    }}>
+                        {formState === 0 ? "Sign in" : "Create an account"}
+                    </h1>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary, #9aa0a6)' }}>
+                        to continue to Yorsa Meet
+                    </p>
                 </div>
 
-                <div className="authTabs">
-                    <div className={`authTabIndicator ${formState === 1 ? 'registerActive' : ''}`} />
-                    <button 
-                        type="button" 
-                        className={`authTabButton ${formState === 0 ? 'active' : ''}`}
-                        onClick={() => { setFormState(0); setError(""); }}
-                    >
-                        Sign In
-                    </button>
-                    <button 
-                        type="button" 
-                        className={`authTabButton ${formState === 1 ? 'active' : ''}`}
-                        onClick={() => { setFormState(1); setError(""); }}
-                    >
-                        Sign Up
-                    </button>
-                </div>
-
-                <form className="authForm" onSubmit={handleAuth}>
-                    <div className={`animateHeightContainer ${formState === 1 ? 'show' : ''}`}>
-                        <div className="authInputGroup" style={{ marginBottom: formState === 1 ? '1.25rem' : '0' }}>
-                            <input 
+                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {formState === 1 && (
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-secondary, #9aa0a6)', marginBottom: '6px' }}>
+                                Full Name
+                            </label>
+                            <input
                                 type="text"
-                                id="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="authInputField"
-                                placeholder=" "
                                 required={formState === 1}
+                                placeholder="Your full name"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 14px',
+                                    background: 'var(--bg-elevated, #28292a)',
+                                    border: '1px solid var(--border-subtle, #3c4043)',
+                                    borderRadius: '8px',
+                                    color: 'var(--text-primary, #e8eaed)',
+                                    fontSize: '0.95rem',
+                                    boxSizing: 'border-box',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s ease'
+                                }}
                             />
-                            <label htmlFor="name" className="authInputLabel">Full Name</label>
                         </div>
-                    </div>
+                    )}
 
-                    <div className="authInputGroup">
-                        <input 
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-secondary, #9aa0a6)', marginBottom: '6px' }}>
+                            Username
+                        </label>
+                        <input
                             type="text"
-                            id="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="authInputField"
-                            placeholder=" "
                             required
+                            placeholder="Enter your username"
+                            style={{
+                                width: '100%',
+                                padding: '12px 14px',
+                                background: 'var(--bg-elevated, #28292a)',
+                                border: '1px solid var(--border-subtle, #3c4043)',
+                                borderRadius: '8px',
+                                color: 'var(--text-primary, #e8eaed)',
+                                fontSize: '0.95rem',
+                                boxSizing: 'border-box',
+                                outline: 'none',
+                                transition: 'border-color 0.2s ease'
+                            }}
                         />
-                        <label htmlFor="username" className="authInputLabel">Username</label>
                     </div>
 
-                    <div className="authInputGroup">
-                        <input 
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-secondary, #9aa0a6)', marginBottom: '6px' }}>
+                            Password
+                        </label>
+                        <input
                             type="password"
-                            id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="authInputField"
-                            placeholder=" "
                             required
+                            placeholder="Enter your password"
+                            style={{
+                                width: '100%',
+                                padding: '12px 14px',
+                                background: 'var(--bg-elevated, #28292a)',
+                                border: '1px solid var(--border-subtle, #3c4043)',
+                                borderRadius: '8px',
+                                color: 'var(--text-primary, #e8eaed)',
+                                fontSize: '0.95rem',
+                                boxSizing: 'border-box',
+                                outline: 'none',
+                                transition: 'border-color 0.2s ease'
+                            }}
                         />
-                        <label htmlFor="password" className="authInputLabel">Password</label>
                     </div>
 
-                    <div className="authErrorMessage">{error}</div>
+                    {error && (
+                        <div style={{ color: '#ea4335', fontSize: '0.85rem', marginTop: '2px', textAlign: 'center' }}>
+                            {error}
+                        </div>
+                    )}
 
-                    <button type="submit" className="btn-yorsa" style={{ width: '100%', marginTop: '1rem' }}>
-                        {formState === 0 ? "Login" : "Register"}
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setFormState(s => (s === 0 ? 1 : 0));
+                                setError("");
+                            }}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#8ab4f8',
+                                fontSize: '0.88rem',
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                padding: 0
+                            }}
+                        >
+                            {formState === 0 ? "Create account" : "Sign in instead"}
+                        </button>
+
+                        <button
+                            type="submit"
+                            className="btn-meet-primary"
+                            style={{ padding: '10px 24px', fontSize: '0.9rem' }}
+                        >
+                            {formState === 0 ? "Next" : "Create"}
+                        </button>
+                    </div>
                 </form>
+
+                <div style={{ marginTop: '2.5rem', textAlign: 'center', borderTop: '1px solid var(--border-subtle, #3c4043)', paddingTop: '1.25rem' }}>
+                    <button
+                        onClick={() => navigate(`/meeting/yorsa-guest-${Math.random().toString(36).substring(2, 6)}`)}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--text-secondary, #9aa0a6)',
+                            fontSize: '0.85rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Skip and join as guest →
+                    </button>
+                </div>
             </div>
 
             <Snackbar
